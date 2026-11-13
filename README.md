@@ -1,79 +1,134 @@
-# PlateRank AI — AISO agent for one restaurant
+<h1 align="center">PlateRank AI</h1>
 
-Built for the NYU SPS × Pulse Foundry hackathon (Oct 23, 2026). Live case: **Café Athena**, Greek & Mediterranean,
-1846 Garnet Ave, Pacific Beach, San Diego (open since 1990).
+<p align="center">
+  <b>AI Search Optimisation (AISO) agent for restaurants</b><br>
+  Measures when AI assistants recommend a restaurant, compares it with competitors, drafts evidence-backed fixes,
+  and re-checks whether they worked.
+</p>
 
-**Problem.** Diners now ask AI assistants where to eat. A restaurant AI doesn't name loses the customer before a
-search page is ever opened, and owners can't see their AI ranking, why competitors win, or whether a fix worked.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black" alt="React + Vite">
+  <img src="https://img.shields.io/badge/Tailwind-CSS-38BDF8?logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Anthropic-Claude-D97757" alt="Anthropic Claude">
+  <img src="https://img.shields.io/badge/NYU%20SPS%20%C3%97%20Pulse%20Foundry-Hackathon%202026-57068C" alt="NYU SPS x Pulse Foundry Hackathon">
+</p>
 
-**What PlateRank does.** It asks AI the questions customers ask, measures who gets recommended, explains why with
-source links, drafts the fixes (the owner approves every one), and re-checks over time.
+---
 
-## Café Athena, live (one check of 36 questions, Claude + web search, Oct 23)
-| | Mentioned in AI answers |
+## Overview
+
+Diners increasingly ask AI assistants where to eat. A restaurant the AI doesn't name can lose the customer before a search page is ever opened, and owners have no way to see their AI ranking, why competitors win, or whether a change helped.
+
+PlateRank asks AI the questions customers actually ask, measures who gets recommended, explains why with source links, drafts improvements for the owner to approve, and re-runs the check over time.
+
+Built for the **NYU SPS × Pulse Foundry hackathon** (October 2026). Live case study: **Café Athena**, a Greek and Mediterranean restaurant in Pacific Beach, San Diego.
+
+## Live case study: Café Athena
+
+One check of **36 customer questions** using Claude with web search, run on October 23, 2026:
+
+| Restaurant | Mentioned in AI answers |
 |---|---|
 | **Café Athena** | **83%** (average position 1.2) |
-| Spitz - Pacific Beach | 56% |
+| Spitz – Pacific Beach | 56% |
 | Slowly Restaurant & Lounge | 17% |
 | Mr Shawarma | 11% |
 | Shawarma Shack | 6% |
 
-**The gap:** AI names Café Athena **0%** of the time for *happy hour* and *drinks*, even though it runs a daily 3–6pm
-happy hour and a full bar with Greek-mythology cocktails. Its website never says so where AI looks (no FAQ; the
-title and description never mention happy hour or cocktails), and none of the 10 verified reviews mention the bar.
-One run is directional - AI answers vary, which is why the re-check exists.
+**The gap PlateRank found:** AI named Café Athena **0%** of the time for *happy hour* and *drinks* questions, despite a daily happy hour and a full cocktail bar. The website never stated this where AI looks (no FAQ, nothing in the title or description), and none of the verified reviews mentioned the bar. PlateRank drafted the fixes for each of those gaps.
 
-## The 7 tabs
-1. **Where you rank** - mention rate, average position, share of voice vs competitors, results per question type.
-   Every AI answer is kept with its source links.
-2. **Housekeeping** - reads the real website (homepage, robots.txt, llms.txt) and drafts the fixes: a visible FAQ,
-   title + meta description, robots.txt for AI search bots, schema (JSON-LD), llms.txt, About us, landing page.
-   Each shows *Now (with link) → Proposed → Why → Evidence strength*. Written by code from confirmed facts only.
-3. **Social media** - real local creators found by web search; only verified profiles are scored, each with a
-   content brief and an outreach draft.
-4. **Business value** - food, service, ambience and value from verified review quotes; complaints first, then
-   "Gap: never mentioned" actions (e.g. 0 of 10 reviews mention drinks). No menu price-change advice.
-5. **Data farming** - Reddit: finds subreddits and threads, drafts posts in the owner's voice; the owner posts them
-   via a prefilled link. **Two-agent review:** a Promoter and a Skeptic debate each draft against 7 rules
-   (owner disclosed, facts true, no fake reviews, no review incentives, no unprovable "best", fits the community,
-   subreddit rules read). Code - not AI - turns their checks into the verdict; the same draft gets the same answer.
-6. **Your to-do list** - one ranked list built from every tab.
-7. **Did it improve?** - re-run all questions or only chosen question types and compare with the first check.
+> A single run is directional: AI answers vary between runs, which is why the re-check feature exists. These are not permanent rankings.
 
-## Honesty rules (enforced in code and checks)
-- **Evidence ledger:** every fact from the internet is *verified* (page read or search citation), *unverified* or
-  *rejected*. Only verified items feed scores and drafts.
-- Labels everywhere: **LIVE / CACHED / SAMPLE / FAILED** (failed answers are left out of every number).
-- No invented reviews, ratings, creators, prices or competitors; unknowns become `[OWNER TO CONFIRM]`.
-- Nothing is published or sent automatically. The owner approves, then posts or sends it themselves.
-- Never certifies a dish as allergy-safe. No same-day ranking claims.
+## The seven tabs
 
-## Run it (Windows / Mac, Python 3.11+)
-```bash
-pip install -r requirements.txt
-copy .env.example .env        # Mac: cp .env.example .env  - then add ANTHROPIC_API_KEY=... (no quotes)
-python check.py               # offline checks, free, ~20 s - all must PASS
-python run.py                 # opens http://127.0.0.1:8000
+| Tab | What it does |
+|---|---|
+| **Where you rank** | Mention rate, average position, share of voice versus competitors, and results by question type. Every AI answer is stored with its source links. |
+| **Website housekeeping** | Reads the live website (homepage, `robots.txt`, `llms.txt`) and drafts a visible FAQ, title and meta description, AI-crawler rules, JSON-LD structured data, `llms.txt`, About copy and landing pages. Each shows *current → proposed → why → evidence strength*. |
+| **Social media** | Finds real local creators through web search, verifies their profiles, scores candidates, and drafts a content brief and outreach message for each. |
+| **Business value** | Analyses verified review quotes on food, service, ambience and value; surfaces complaints first, then topics reviews never mention. |
+| **Data farming** | Finds relevant Reddit communities and threads, then drafts posts in the owner's voice. A **Promoter** and a **Skeptic** agent review each draft against seven rules; code, not the model, turns their checks into the verdict. |
+| **Your to-do list** | One ranked list of actions built from every tab. |
+| **Did it improve?** | Re-runs all questions, or only selected question types, and compares the result with the earlier check. |
+
+## Evidence, safety and trust
+
+- **Evidence ledger.** Every fact from the web is classified as *verified* (cited page read or search citation), *unverified* or *rejected*. Only verified facts feed scores and drafts.
+- **Status labels.** Results are marked **LIVE**, **CACHED**, **SAMPLE** or **FAILED**; failed answers are excluded from every number.
+- **No fabrication.** The system never invents reviews, ratings, creators, prices or competitors. Unknown facts are flagged `[OWNER TO CONFIRM]`.
+- **Owner in control.** Nothing is published or sent automatically; the owner approves, then posts or sends it.
+- **Safety limits.** Never certifies a dish as allergy-safe, and makes no same-day ranking claims.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[Owner<br/>React · Vite · Tailwind] --> API[FastAPI backend]
+    API --> P[Pipeline<br/>question bank · discovery · analysis]
+    P --> LLM[Claude<br/>web search · web fetch]
+    P --> OSM[OpenStreetMap<br/>restaurant + competitor lookup]
+    P --> WEB[Website page reads]
+    LLM --> EV[Evidence ledger<br/>verified / unverified / rejected]
+    WEB --> EV
+    EV --> M[Modules<br/>rank · housekeeping · creators<br/>reviews · Reddit · to-do]
+    M --> API
 ```
-No key? The app still runs on saved answers and the SAMPLE restaurant (Greenwich Kitchen, fictional).
-`python check.py --live` also tests the real key + web search + web fetch (~$0.02).
-`python tools/recheck.py` re-runs the check from the command line (`--categories happy-hour,drinks` for a subset).
 
-## Check a new restaurant
-1. Home → **Check a restaurant** → pick the city, type the name (not on the map? **Find it on the web**).
+- **Backend:** FastAPI (`api.py`) over the `platerank/` package: pipeline, discovery, analysis, evidence, AISO drafts, creators, reviews, Reddit and the two-agent review. All Claude calls go through `platerank/llm.py`.
+- **Frontend:** React, Vite and Tailwind CSS in `web/`, prebuilt into `web/dist`, so running the app needs only Python.
+- **Data:** OpenStreetMap for map search, Claude with web search and web fetch for answers, facts, reviews and creators, and plain page reads for websites. Per-restaurant data is saved in `data/live/<slug>/`.
+- **Testing:** offline checks with simulated AI and web responses (no paid calls), a frontend type check, and an optional live test.
+
+## Getting started
+
+**Requirements:** Python 3.11+. An Anthropic API key is optional; without one the app runs on saved answers and a fictional sample restaurant.
+
+```bash
+git clone https://github.com/aishwaryapurohit15/platerank.git
+cd platerank
+pip install -r requirements.txt
+
+cp .env.example .env       # Windows: copy .env.example .env
+# add ANTHROPIC_API_KEY=... to .env
+
+python check.py            # offline checks, ~20 s, all should PASS
+python run.py              # opens http://127.0.0.1:8000
+```
+
+- `python check.py --live` also tests the real key, web search and web fetch.
+- `python tools/recheck.py` re-runs the check from the command line (`--categories happy-hour,drinks` for a subset).
+- Frontend development: `cd web && npm install && npm run dev`, then `npm run build` before committing.
+
+### Checking a new restaurant
+
+1. **Check a restaurant** → choose the city and type the name (or find it on the web if it isn't on the map).
 2. Confirm the basics and owner details.
-3. Pick competitors within a radius, or **Suggest competitors** (with sources).
-4. **Run the check** (the estimate is shown first), then read the 7 tabs.
+3. Pick competitors within a radius, or let PlateRank suggest them with sources.
+4. Run the check (a cost estimate is shown first), then read the seven tabs.
 
-## How it's built
-- **Backend:** FastAPI (`api.py`) over `platerank/` (pipeline, discovery, analysis, evidence, reddit, review_agents,
-  aiso, creators, reviews_vfm, content_gen). All Claude calls go through `platerank/llm.py`.
-- **Frontend:** React + Vite + Tailwind in `web/`, prebuilt into `web/dist` (running needs only Python).
-- **Data:** OpenStreetMap (map search), Claude with web search / web fetch (answers, facts, reviews, creators),
-  plain page reads (websites). Per-restaurant data in `data/live/<slug>/`.
-- **Tests:** `python check.py` runs every offline check (fake AI and fake web - no paid calls) plus the frontend
-  type check. `python tools/install_hooks.py` once per laptop blocks pushes that fail.
+## Project structure
 
-## For developers
-Architecture and rules: `CLAUDE.md`. Earlier status notes: `HANDOFF.md`. Prompts used with Claude Code: `PROMPTS.md`.
-Frontend edits: `cd web && npm install && npm run dev`, then `npm run build` before committing.
+```
+platerank/
+├── api.py                 # FastAPI app
+├── run.py                 # starts the server and opens the browser
+├── check.py               # runs all offline checks
+├── platerank/             # pipeline, discovery, analysis, evidence ledger,
+│                          # AISO drafts, creators, reviews, Reddit, agent review
+├── web/                   # React + Vite + Tailwind frontend (prebuilt in web/dist)
+├── tests/                 # offline checks with simulated AI and web
+├── tools/                 # recheck, live check, git hooks
+└── data/                  # sample data and saved live runs per restaurant
+```
+
+Developer notes: architecture and rules in `CLAUDE.md`, earlier status in `HANDOFF.md`, prompts in `PROMPTS.md`.
+
+## Team
+
+Built at the NYU SPS × Pulse Foundry hackathon by:
+
+- [@aishwaryapurohit15](https://github.com/aishwaryapurohit15)
+- [Harsh Motiramani (@Harshmm2003)](https://github.com/Harshmm2003)
+- Vedaant Melkari
